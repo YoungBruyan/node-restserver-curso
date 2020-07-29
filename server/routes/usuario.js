@@ -4,10 +4,20 @@ const bcrypt = require('bcryptjs');
 const _ =  require('underscore') ;
 
 const Usuario = require('../models/usuario');
+const {verifarToken, verifarAdmin_Role} = require('../middlewares/autenticacion')
+
+
 const app = express();
 
 
-app.get('/usuario', function(req, res) {
+
+app.get('/usuario', verifarToken, (req, res) => {
+
+    /* return res.json({
+        usuario: req.usuario,
+        nombre :  req.nombre,
+        email : req.email
+    }) */
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -43,7 +53,7 @@ app.get('/usuario', function(req, res) {
 
 
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verifarToken, verifarAdmin_Role] ,function(req, res) {
 
 
     let body = req.body;
@@ -76,7 +86,7 @@ app.post('/usuario', function(req, res) {
 
 
 });
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verifarToken, verifarAdmin_Role], function(req, res) {
 
     let id = req.params.id;
     let body = _.pick( req.body, ['nombre','email','img','role','estado'] );
@@ -97,7 +107,7 @@ app.put('/usuario/:id', function(req, res) {
     
 
 });
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verifarToken, verifarAdmin_Role], function(req, res) {
 
     let id = req.params.id;
 
